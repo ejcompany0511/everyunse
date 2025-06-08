@@ -21,10 +21,17 @@ export default function Analysis() {
   const getAnalysisTypeInfo = (type: string) => {
     const types: Record<string, { label: string; color: string }> = {
       comprehensive: { label: "종합운세", color: "bg-purple-100 text-purple-600" },
+      comprehensive_fortune: { label: "종합운세", color: "bg-purple-100 text-purple-600" },
       career: { label: "진로상담", color: "bg-green-100 text-green-600" },
       love: { label: "연애운", color: "bg-pink-100 text-pink-600" },
+      love_potential: { label: "연애운", color: "bg-pink-100 text-pink-600" },
       wealth: { label: "재물운", color: "bg-yellow-100 text-yellow-600" },
-      health: { label: "건강운", color: "bg-blue-100 text-blue-600" }
+      health: { label: "건강운", color: "bg-blue-100 text-blue-600" },
+      compatibility: { label: "궁합분석", color: "bg-red-100 text-red-600" },
+      reunion_potential: { label: "재결합운", color: "bg-orange-100 text-orange-600" },
+      yearly: { label: "연간운세", color: "bg-indigo-100 text-indigo-600" },
+      monthly: { label: "이번 달 운세", color: "bg-teal-100 text-teal-600" },
+      daily: { label: "일일운세", color: "bg-cyan-100 text-cyan-600" }
     };
     return types[type] || { label: "기타", color: "bg-gray-100 text-gray-600" };
   };
