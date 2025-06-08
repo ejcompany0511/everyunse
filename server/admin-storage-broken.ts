@@ -600,12 +600,12 @@ export class AdminStorage {
       // Top service usage
       const topServices = await db
         .select({
-          serviceType: sajuAnalyses.serviceType,
+          serviceType: sajuAnalyses.analysisType,
           count: count(),
         })
         .from(sajuAnalyses)
         .where(gte(sajuAnalyses.createdAt, weekAgo))
-        .groupBy(sajuAnalyses.serviceType)
+        .groupBy(sajuAnalyses.analysisType)
         .orderBy(desc(count()))
         .limit(5);
 
