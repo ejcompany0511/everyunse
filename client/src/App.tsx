@@ -34,7 +34,9 @@ function Router() {
       <Route path="/analysis/:id">
         {(params) => <AnalysisDetail analysisId={params.id} />}
       </Route>
-      <Route path="/analysis/:id/detail" component={AnalysisDetailEnhanced} />
+      <Route path="/analysis/:id/detail">
+        {(params) => <AnalysisDetail analysisId={params.id} />}
+      </Route>
       <Route path="/contacts" component={Contacts} />
       <Route path="/coaching" component={Coaching} />
       <Route path="/reviews" component={Reviews} />
