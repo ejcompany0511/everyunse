@@ -61,14 +61,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `);
         
         // Update existing records with proper display order
+        // Note: Render DB uses camelCase column names
         await db.execute(sql`
-          UPDATE service_prices SET display_order = 1 WHERE service_type = 'monthly_fortune';
-          UPDATE service_prices SET display_order = 2 WHERE service_type = 'love_potential';
-          UPDATE service_prices SET display_order = 3 WHERE service_type = 'reunion_potential';
-          UPDATE service_prices SET display_order = 4 WHERE service_type = 'compatibility';
-          UPDATE service_prices SET display_order = 5 WHERE service_type = 'job_prospects';
-          UPDATE service_prices SET display_order = 6 WHERE service_type = 'marriage_potential';
-          UPDATE service_prices SET display_order = 7 WHERE service_type = 'comprehensive_fortune';
+          UPDATE service_prices SET display_order = 1 WHERE "serviceType" = 'monthly_fortune';
+          UPDATE service_prices SET display_order = 2 WHERE "serviceType" = 'love_potential';
+          UPDATE service_prices SET display_order = 3 WHERE "serviceType" = 'reunion_potential';
+          UPDATE service_prices SET display_order = 4 WHERE "serviceType" = 'compatibility';
+          UPDATE service_prices SET display_order = 5 WHERE "serviceType" = 'job_prospects';
+          UPDATE service_prices SET display_order = 6 WHERE "serviceType" = 'marriage_potential';
+          UPDATE service_prices SET display_order = 7 WHERE "serviceType" = 'comprehensive_fortune';
         `);
         
         console.log('✅ Schema fixed: display_order column added and populated');
