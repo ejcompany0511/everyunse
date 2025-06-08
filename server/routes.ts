@@ -440,14 +440,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         result: aiResult,
         summary: (() => {
           // 운세 내용에서 첫 번째 문장 또는 150자 미리보기 추출
-          const content = aiResult.fortune.overall || 
-                         aiResult.fortune.compatibility ||
-                         aiResult.fortune.love ||
-                         aiResult.fortune.career ||
-                         aiResult.fortune.wealth ||
-                         aiResult.fortune.health ||
+          const content = aiResult.fortune?.overall || 
+                         aiResult.fortune?.compatibility ||
+                         aiResult.fortune?.love ||
+                         aiResult.fortune?.career ||
+                         aiResult.fortune?.wealth ||
+                         aiResult.fortune?.health ||
+                         aiResult.fortune?.monthly ||
+                         aiResult.fortune?.yearly ||
+                         aiResult.fortune?.daily ||
                          aiResult.recommendations?.[0] ||
-                         JSON.stringify(aiResult).substring(0, 150);
+                         (typeof aiResult === 'string' ? aiResult : JSON.stringify(aiResult)).substring(0, 150);
           
           // 첫 번째 문장 또는 150자로 제한
           if (typeof content === 'string') {
