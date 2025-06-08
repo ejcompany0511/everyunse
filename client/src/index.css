@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 11% 98%; /* #F5F7FA */
+  --foreground: 222 84% 5%; /* #0F172A */
+  --muted: 210 40% 96%; /* #F1F5F9 */
+  --muted-foreground: 215 16% 47%; /* #64748B */
+  --popover: 0 0% 100%; /* #FFFFFF */
+  --popover-foreground: 222 84% 5%; /* #0F172A */
+  --card: 0 0% 100%; /* #FFFFFF */
+  --card-foreground: 222 84% 5%; /* #0F172A */
+  --border: 214 32% 91%; /* #E2E8F0 */
+  --input: 214 32% 91%; /* #E2E8F0 */
+  --primary: 245 58% 51%; /* #4F46E5 */
+  --primary-foreground: 210 40% 98%; /* #F8FAFC */
+  --secondary: 210 40% 96%; /* #F1F5F9 */
+  --secondary-foreground: 222 84% 5%; /* #0F172A */
+  --accent: 210 40% 96%; /* #F1F5F9 */
+  --accent-foreground: 222 84% 5%; /* #0F172A */
+  --destructive: 0 84% 60%; /* #EF4444 */
+  --destructive-foreground: 210 40% 98%; /* #F8FAFC */
+  --ring: 245 58% 51%; /* #4F46E5 */
+  --radius: 0.75rem;
+  
+  /* Custom gradient colors */
+  --gradient-start: 245 58% 51%; /* #4F46E5 */
+  --gradient-end: 271 91% 65%; /* #8B5CF6 */
+}
+
+.dark {
+  --background: 222 84% 5%; /* #0F172A */
+  --foreground: 210 40% 98%; /* #F8FAFC */
+  --muted: 217 33% 17%; /* #1E293B */
+  --muted-foreground: 215 20% 65%; /* #94A3B8 */
+  --popover: 222 84% 5%; /* #0F172A */
+  --popover-foreground: 210 40% 98%; /* #F8FAFC */
+  --card: 222 84% 5%; /* #0F172A */
+  --card-foreground: 210 40% 98%; /* #F8FAFC */
+  --border: 217 33% 17%; /* #1E293B */
+  --input: 217 33% 17%; /* #1E293B */
+  --primary: 245 58% 51%; /* #4F46E5 */
+  --primary-foreground: 210 40% 98%; /* #F8FAFC */
+  --secondary: 217 33% 17%; /* #1E293B */
+  --secondary-foreground: 210 40% 98%; /* #F8FAFC */
+  --accent: 217 33% 17%; /* #1E293B */
+  --accent-foreground: 210 40% 98%; /* #F8FAFC */
+  --destructive: 0 62% 30%; /* #991B1B */
+  --destructive-foreground: 210 40% 98%; /* #F8FAFC */
+  --ring: 245 58% 51%; /* #4F46E5 */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  }
+}
+
+@layer components {
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--gradient-start)) 0%, hsl(var(--gradient-end)) 100%);
+  }
+  
+  .card-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .soft-shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  .mobile-container {
+    @apply max-w-md mx-auto bg-white min-h-screen relative;
+  }
+
+  .action-card {
+    @apply bg-white rounded-2xl p-4 soft-shadow hover:shadow-md transition-shadow cursor-pointer;
+  }
+
+  .icon-circle {
+    @apply w-12 h-12 rounded-full flex items-center justify-center text-lg;
+  }
+
+  /* 결제창 전체 표시 최적화 - 강력한 규칙 */
+  iframe[title*="portone"], 
+  iframe[src*="iamport"], 
+  iframe[src*="inicis"],
+  iframe[name="payment_popup"],
+  iframe[src*="kg-inicis"],
+  iframe[src*="inipay"] {
+    max-width: 90vw !important;
+    max-height: 80vh !important;
+    width: 380px !important;
+    height: 520px !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.95) !important;
+    z-index: 99999 !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+    overflow: auto !important;
+  }
+  
+  /* 팝업 윈도우 크기 조정 */
+  .imp-popup,
+  div[id*="portone"], 
+  div[class*="payment"],
+  div[class*="inicis"],
+  .payment-popup,
+  [class*="popup"] {
+    max-width: 90vw !important;
+    max-height: 80vh !important;
+    width: 380px !important;
+    height: 520px !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.95) !important;
+    z-index: 99999 !important;
+    overflow: auto !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+  }
+
+  /* 모든 팝업 관련 요소 강제 스타일 */
+  body > div[style*="position"],
+  html > div[style*="position"] {
+    max-width: 90vw !important;
+    max-height: 80vh !important;
+    width: 380px !important;
+    height: 520px !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.95) !important;
+    z-index: 99999 !important;
+  }
+
+  /* 모바일 환경 추가 최적화 */
+  @media (max-width: 768px) {
+    iframe[title*="portone"], 
+    iframe[src*="iamport"], 
+    iframe[src*="inicis"],
+    iframe[name="payment_popup"] {
+      width: 90vw !important;
+      height: 75vh !important;
+      max-width: 360px !important;
+      max-height: 500px !important;
+    }
+    
+    .imp-popup,
+    div[id*="portone"], 
+    div[class*="payment"] {
+      width: 90vw !important;
+      height: 75vh !important;
+      max-width: 360px !important;
+      max-height: 500px !important;
+    }
+  }
+
+  /* 작은 화면 대응 */
+  @media (max-height: 600px) {
+    iframe[title*="portone"], 
+    iframe[src*="iamport"], 
+    iframe[src*="inicis"],
+    iframe[name="payment_popup"] {
+      height: 90vh !important;
+      max-height: 90vh !important;
+    }
+    
+    .imp-popup,
+    div[id*="portone"], 
+    div[class*="payment"] {
+      height: 90vh !important;
+      max-height: 90vh !important;
+    }
+  }
+}
