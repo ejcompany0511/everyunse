@@ -31,7 +31,7 @@ export const sajuAnalyses = pgTable("saju_analyses", {
   userId: integer("user_id").notNull(),
   title: text("title").notNull(),
   analysisType: text("analysis_type").notNull(), // comprehensive, career, love, wealth, health
-  serviceType: text("service_type").default("comprehensive"), // same as analysisType for consistency
+  serviceType: text("service_type"), // nullable field for consistency
   birthData: jsonb("birth_data").notNull(), // { date, time, gender }
   result: jsonb("result").notNull(), // AI analysis result
   summary: text("summary").notNull(),
