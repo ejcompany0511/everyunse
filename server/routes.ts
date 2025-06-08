@@ -449,6 +449,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                          aiResult.fortune?.monthly ||
                          aiResult.fortune?.yearly ||
                          aiResult.fortune?.daily ||
+                         aiResult.fortune?.marriage ||
+                         aiResult.fortune?.reunion ||
                          aiResult.recommendations?.[0] ||
                          (typeof aiResult === 'string' ? aiResult : JSON.stringify(aiResult)).substring(0, 150);
           
