@@ -438,10 +438,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analysisType,
         birthData,
         result: aiResult,
-        summary:
-          aiResult.fortune.overall ||
-          aiResult.fortune.compatibility ||
-          "분석 결과",
+        summary: (() => {
+          // 운세 내용에서 첫 번째 문장 또는 150자 미리보기 추출
+          const content = aiResult.fortune.overall || 
+                         aiResult.fortune.compatibility ||
+                         aiResult.fortune.love ||
+                         aiResult.fortune.career ||
+                         aiResult.fortune.wealth ||
+                         aiResult.fortune.health ||
+                         aiResult.recommendations?.[0] ||
+                         JSON.stringify(aiResult).substring(0, 150);
+          
+          // 첫 번째 문장 또는 150자로 제한
+          if (typeof content === 'string') {
+            const firstSentence = content.split(/[.!?。]/)[0];
+            return firstSentence.length > 150 ? 
+              content.substring(0, 150) + '...' : 
+              firstSentence + (firstSentence === content ? '' : '...');
+          }
+          
+          return content ? String(content).substring(0, 150) + '...' : "운세 분석을 확인해보세요";
+        })(),
       });
 
       const analysis = await storage.createSajuAnalysis(analysisData);
