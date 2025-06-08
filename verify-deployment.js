@@ -3,7 +3,10 @@
 // Deployment verification script
 // Tests database connectivity and schema integrity
 
-const { Pool } = require('@neondatabase/serverless');
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import ws from 'ws';
+
+neonConfig.webSocketConstructor = ws;
 
 async function verifyDeployment() {
   console.log('🔍 Verifying deployment...');
@@ -55,10 +58,10 @@ async function verifyDeployment() {
 }
 
 // Run verification if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   verifyDeployment().then(success => {
     process.exit(success ? 0 : 1);
   });
 }
 
-module.exports = { verifyDeployment };
+export { verifyDeployment };
