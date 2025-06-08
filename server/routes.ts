@@ -36,46 +36,70 @@ const requireAuth = async (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Temporary debug endpoint for Render
-  app.get("/api/debug/schema", async (req, res) => {
+  // Auto-fix schema inconsistencies on startup
+  const ensureSchemaConsistency = async () => {
     try {
-      console.log('=== DEBUGGING service_prices TABLE ===');
+      console.log('=== CHECKING AND FIXING SCHEMA CONSISTENCY ===');
       
-      // Import required modules for raw SQL
       const { sql } = await import('drizzle-orm');
       const { db } = await import('./db');
       
-      // Check if table exists
-      const tableCheck = await db.execute(sql`
+      // Check if display_order column exists in service_prices table
+      const displayOrderCheck = await db.execute(sql`
         SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_name = 'service_prices'
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'service_prices' 
+          AND column_name = 'display_order'
         );
       `);
-      console.log('Table exists:', tableCheck.rows[0].exists);
       
-      // Check column structure
+      if (!displayOrderCheck.rows[0].exists) {
+        console.log('Adding missing display_order column...');
+        await db.execute(sql`
+          ALTER TABLE service_prices 
+          ADD COLUMN display_order INTEGER NOT NULL DEFAULT 0;
+        `);
+        
+        // Update existing records with proper display order
+        await db.execute(sql`
+          UPDATE service_prices SET display_order = 1 WHERE service_type = 'monthly_fortune';
+          UPDATE service_prices SET display_order = 2 WHERE service_type = 'love_potential';
+          UPDATE service_prices SET display_order = 3 WHERE service_type = 'reunion_potential';
+          UPDATE service_prices SET display_order = 4 WHERE service_type = 'compatibility';
+          UPDATE service_prices SET display_order = 5 WHERE service_type = 'job_prospects';
+          UPDATE service_prices SET display_order = 6 WHERE service_type = 'marriage_potential';
+          UPDATE service_prices SET display_order = 7 WHERE service_type = 'comprehensive_fortune';
+        `);
+        
+        console.log('✅ Schema fixed: display_order column added and populated');
+      } else {
+        console.log('✅ Schema OK: display_order column exists');
+      }
+    } catch (error) {
+      console.error('Schema consistency check failed:', error.message);
+    }
+  };
+  
+  // Run schema check on startup
+  await ensureSchemaConsistency();
+  
+  // Debug endpoint for troubleshooting
+  app.get("/api/debug/schema", async (req, res) => {
+    try {
+      const { sql } = await import('drizzle-orm');
+      const { db } = await import('./db');
+      const { servicePrices } = await import('@shared/schema');
+      
       const columns = await db.execute(sql`
         SELECT column_name, data_type, is_nullable 
         FROM information_schema.columns 
         WHERE table_name = 'service_prices'
         ORDER BY ordinal_position;
       `);
-      console.log('Columns:', columns.rows);
       
-      // Try to import servicePrices table and test select
-      const { servicePrices } = await import('@shared/schema');
-      
-      try {
-        const testSelect = await db.select().from(servicePrices).limit(1);
-        console.log('Sample data:', testSelect);
-        res.json({ success: true, columns: columns.rows, sampleData: testSelect });
-      } catch (selectError) {
-        console.error('Select error:', selectError.message);
-        res.json({ success: false, error: selectError.message, columns: columns.rows });
-      }
+      const testSelect = await db.select().from(servicePrices).limit(3);
+      res.json({ success: true, columns: columns.rows, sampleData: testSelect });
     } catch (error) {
-      console.error('Debug error:', error.message);
       res.status(500).json({ error: error.message });
     }
   });
