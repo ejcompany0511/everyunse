@@ -15,7 +15,8 @@ export default function AnalysisDetail({ analysisId }: AnalysisDetailProps) {
   const [, navigate] = useLocation();
 
   const { data: analysisData, isLoading } = useQuery({
-    queryKey: ["/api/saju/analysis", analysisId],
+    queryKey: [`/api/saju/analysis/${analysisId}`],
+    enabled: !!analysisId,
   });
 
   const analysis = analysisData?.analysis;
