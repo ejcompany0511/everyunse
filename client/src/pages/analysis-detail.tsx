@@ -82,6 +82,8 @@ export default function AnalysisDetail({ analysisId }: AnalysisDetailProps) {
       health: { label: "건강운", color: "bg-blue-100 text-blue-600" },
       compatibility: { label: "궁합분석", color: "bg-red-100 text-red-600" },
       reunion_potential: { label: "재결합운", color: "bg-orange-100 text-orange-600" },
+      reunion: { label: "재회운", color: "bg-orange-100 text-orange-600" },
+      marriage: { label: "결혼운", color: "bg-rose-100 text-rose-600" },
       yearly: { label: "연간운세", color: "bg-indigo-100 text-indigo-600" },
       monthly: { label: "이번 달 운세", color: "bg-teal-100 text-teal-600" },
       daily: { label: "일일운세", color: "bg-cyan-100 text-cyan-600" }
@@ -185,6 +187,8 @@ export default function AnalysisDetail({ analysisId }: AnalysisDetailProps) {
                      analysis.analysisType === 'compatibility' ? '궁합 분석' :
                      analysis.analysisType === 'love_potential' ? '연애 가능성' :
                      analysis.analysisType === 'reunion_potential' ? '재회 가능성' :
+                     analysis.analysisType === 'reunion' ? '재회 운세' :
+                     analysis.analysisType === 'marriage' ? '결혼 운세' :
                      analysis.analysisType === 'comprehensive_fortune' ? '종합 운세' :
                      '운세 분석'}
                   </CardTitle>
