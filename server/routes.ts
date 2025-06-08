@@ -36,6 +36,50 @@ const requireAuth = async (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Temporary debug endpoint for Render
+  app.get("/api/debug/schema", async (req, res) => {
+    try {
+      console.log('=== DEBUGGING service_prices TABLE ===');
+      
+      // Import required modules for raw SQL
+      const { sql } = await import('drizzle-orm');
+      const { db } = await import('./db');
+      
+      // Check if table exists
+      const tableCheck = await db.execute(sql`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_name = 'service_prices'
+        );
+      `);
+      console.log('Table exists:', tableCheck.rows[0].exists);
+      
+      // Check column structure
+      const columns = await db.execute(sql`
+        SELECT column_name, data_type, is_nullable 
+        FROM information_schema.columns 
+        WHERE table_name = 'service_prices'
+        ORDER BY ordinal_position;
+      `);
+      console.log('Columns:', columns.rows);
+      
+      // Try to import servicePrices table and test select
+      const { servicePrices } = await import('@shared/schema');
+      
+      try {
+        const testSelect = await db.select().from(servicePrices).limit(1);
+        console.log('Sample data:', testSelect);
+        res.json({ success: true, columns: columns.rows, sampleData: testSelect });
+      } catch (selectError) {
+        console.error('Select error:', selectError.message);
+        res.json({ success: false, error: selectError.message, columns: columns.rows });
+      }
+    } catch (error) {
+      console.error('Debug error:', error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Auth routes
   app.post("/api/auth/login", async (req, res) => {
     try {
