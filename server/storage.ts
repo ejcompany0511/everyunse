@@ -770,6 +770,32 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(0, limit);
   }
+
+  // Helper methods for migration
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async getAllServicePrices(): Promise<ServicePrice[]> {
+    return Array.from(this.servicePrices.values());
+  }
+
+  async getAllReviews(): Promise<Review[]> {
+    return Array.from(this.reviews.values());
+  }
+
+  async getAllTransactions(): Promise<CoinTransaction[]> {
+    return Array.from(this.coinTransactions.values());
+  }
+
+  async getAllAdminUsers(): Promise<AdminUser[]> {
+    // Return empty array since no admin users in MemStorage
+    return [];
+  }
+
+  async getAllDailyFortunes(): Promise<DailyFortune[]> {
+    return Array.from(this.dailyFortunes.values());
+  }
 }
 
 import { DatabaseStorage } from "./db-storage";
