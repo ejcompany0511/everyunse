@@ -182,18 +182,27 @@ export default function AnalysisDetail({ analysisId }: AnalysisDetailProps) {
                 </CardHeader>
                 <CardContent>
                   <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {result.fortune.monthly ||
-                     result.fortune.yearly ||
-                     result.fortune.comprehensive ||
-                     result.fortune.career ||
-                     result.fortune.love ||
-                     result.fortune.wealth ||
-                     result.fortune.health ||
-                     result.fortune.compatibility ||
-                     result.fortune.love_potential ||
-                     result.fortune.reunion_potential ||
-                     result.fortune.overall ||
-                     '분석 결과가 없습니다.'}
+                    {(() => {
+                      // 분석 타입에 따라 적절한 fortune 필드 선택
+                      const fortuneContent = 
+                        result.fortune[analysis.analysisType] ||
+                        result.fortune.monthly ||
+                        result.fortune.yearly ||
+                        result.fortune.comprehensive ||
+                        result.fortune.career ||
+                        result.fortune.love ||
+                        result.fortune.wealth ||
+                        result.fortune.health ||
+                        result.fortune.compatibility ||
+                        result.fortune.love_potential ||
+                        result.fortune.reunion_potential ||
+                        result.fortune.overall ||
+                        Object.values(result.fortune)[0] || // 첫 번째 값 사용
+                        '분석 결과가 없습니다.';
+                      
+                      console.log("Fortune content to display:", fortuneContent);
+                      return fortuneContent;
+                    })()}
                   </div>
                 </CardContent>
               </Card>
