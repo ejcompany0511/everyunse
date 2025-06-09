@@ -64,6 +64,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         console.log('✅ Schema OK: displayOrder column exists');
       }
+      
+      // Force production table creation if needed (deployment trigger: 2025-01-09)
+      const forceTableCreation = await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS "servicePrices" (
+          id SERIAL PRIMARY KEY,
+          "serviceType" VARCHAR NOT NULL UNIQUE,
+          "coinCost" INTEGER NOT NULL DEFAULT 0,
+          "displayOrder" INTEGER NOT NULL DEFAULT 0,
+          description TEXT,
+          "createdAt" TIMESTAMP DEFAULT NOW(),
+          "updatedAt" TIMESTAMP DEFAULT NOW()
+        );
+      `);
+      
+      // Ensure service data exists
+      await db.execute(sql`
+        INSERT INTO "servicePrices" ("serviceType", "coinCost", "displayOrder") VALUES
+        ('saju_analysis', 0, 1),
+        ('monthly_fortune', 0, 2),
+        ('love_potential', 25, 3),
+        ('reunion_potential', 25, 4),
+        ('compatibility', 25, 5),
+        ('job_prospects', 0, 6),
+        ('marriage_potential', 0, 7),
+        ('comprehensive_fortune', 30, 8)
+        ON CONFLICT ("serviceType") DO NOTHING;
+      `);
+      
+      console.log('✅ Production schema ensured');
+      
     } catch (error) {
       console.error('Schema consistency check failed:', error.message);
     }
