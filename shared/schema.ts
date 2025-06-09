@@ -326,15 +326,15 @@ export const systemNotifications = pgTable("systemNotifications", {
   createdAt: timestamp("createdAt").defaultNow(),
 });
 
-export const userNotifications = pgTable("user_notifications", {
+export const userNotifications = pgTable("userNotifications", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: integer("userId").references(() => users.id).notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
   type: text("type").notNull(), // inquiry_response, system_announcement, etc
-  isRead: boolean("is_read").default(false),
-  relatedId: integer("related_id"), // inquiry id, report id, etc
-  createdAt: timestamp("created_at").defaultNow(),
+  isRead: boolean("isRead").default(false),
+  relatedId: integer("relatedId"), // inquiry id, report id, etc
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
 export const announcements = pgTable("announcements", {
@@ -343,22 +343,22 @@ export const announcements = pgTable("announcements", {
   content: text("content").notNull(),
   type: text("type").notNull(), // notice, event, maintenance, update
   priority: text("priority").notNull(), // normal, urgent
-  targetAudience: text("target_audience").notNull(), // all, premium, new
-  adminId: integer("admin_id").references(() => adminUsers.id).notNull(),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+  targetAudience: text("targetAudience").notNull(), // all, premium, new
+  adminId: integer("adminId").references(() => adminUsers.id).notNull(),
+  isActive: boolean("isActive").default(true),
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
-export const salesStats = pgTable("sales_stats", {
+export const salesStats = pgTable("salesStats", {
   id: serial("id").primaryKey(),
   date: date("date").notNull(),
-  totalRevenue: text("total_revenue").default("0"),
-  totalTransactions: integer("total_transactions").default(0),
-  newUsers: integer("new_users").default(0),
-  activeUsers: integer("active_users").default(0),
-  topProducts: jsonb("top_products").default({}),
-  conversionRate: text("conversion_rate").default("0"),
-  createdAt: timestamp("created_at").defaultNow(),
+  totalRevenue: text("totalRevenue").default("0"),
+  totalTransactions: integer("totalTransactions").default(0),
+  newUsers: integer("newUsers").default(0),
+  activeUsers: integer("activeUsers").default(0),
+  topProducts: jsonb("topProducts").default({}),
+  conversionRate: text("conversionRate").default("0"),
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
 // Admin Relations
