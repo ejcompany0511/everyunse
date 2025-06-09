@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: everyunse-payment-server
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: VITE_PORTONE_STORE_ID
+        fromSecret: VITE_PORTONE_STORE_ID
+      - key: VITE_PORTONE_CHANNEL_KEY
+        fromSecret: VITE_PORTONE_CHANNEL_KEY
+      - key: PORTONE_API_SECRET
+        fromSecret: PORTONE_API_SECRET
+      - key: INTERNAL_API_KEY
+        fromSecret: INTERNAL_API_KEY
+      - key: REPLIT_APP_URL
+        value: https://everyunse.replit.app
+      - key: REPLIT_API_URL
+        value: https://everyunse.replit.app
+      - key: RENDER_API_URL
+        sync: false
+    healthCheckPath: /
