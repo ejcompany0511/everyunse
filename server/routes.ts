@@ -1158,8 +1158,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Call Render payment server
-      const paymentResponse = await fetch(`${process.env.RENDER_PAYMENT_URL}/api/create-payment`, {
+      // Call Render payment server (fallback to localhost for testing)
+      const paymentServerUrl = process.env.RENDER_PAYMENT_URL || 'http://localhost:3001';
+      const paymentResponse = await fetch(`${paymentServerUrl}/api/create-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
