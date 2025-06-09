@@ -37,10 +37,11 @@ async function fixProductionSchema() {
       );
     `);
     
-    // Add description column if it doesn't exist
+    // Add missing columns if they don't exist
     await client.query(`
       ALTER TABLE "servicePrices" 
-      ADD COLUMN IF NOT EXISTS description TEXT;
+      ADD COLUMN IF NOT EXISTS description TEXT,
+      ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN DEFAULT true;
     `);
     
     // Insert service data
