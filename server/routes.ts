@@ -1147,6 +1147,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Payment integration with Render payment server
+  app.post("/api/payment/create", requireAuth, async (req, res) => {
+    try {
+      const { serviceType, amount } = req.body;
+      const userId = (req.session as any).userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Call Render payment server
+      const paymentResponse = await fetch(`${process.env.RENDER_PAYMENT_URL}/api/create-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount,
+          orderName: `${serviceType} 서비스`,
+          customerName: user.name,
+          customerEmail: user.email,
+          customerPhone: user.phone || '',
+          userId,
+          serviceType
+        })
+      });
+
+      const paymentData = await paymentResponse.json();
+      
+      if (paymentData.success) {
+        res.json(paymentData);
+      } else {
+        res.status(500).json({ message: "결제 요청 생성 실패" });
+      }
+    } catch (error) {
+      console.error("Payment creation error:", error);
+      res.status(500).json({ message: "결제 요청 처리 중 오류 발생" });
+    }
+  });
+
+  // Payment success webhook from Render
+  app.post("/api/payment/webhook", async (req, res) => {
+    try {
+      const { paymentId, amount, userId, serviceType, paidAt } = req.body;
+      
+      // Add coins to user account
+      const coinAmount = Math.floor(amount / 100); // 100원 = 1냥
+      await storage.addCoins(userId, coinAmount, `${serviceType} 결제 완료`, paymentId);
+      
+      console.log(`Payment success: User ${userId} received ${coinAmount} coins for ${serviceType}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Payment webhook error:", error);
+      res.status(500).json({ success: false });
+    }
+  });
+
+  // Payment verification endpoint
+  app.post("/api/payment/verify", requireAuth, async (req, res) => {
+    try {
+      const { paymentId } = req.body;
+      
+      const verifyResponse = await fetch(`${process.env.RENDER_PAYMENT_URL}/api/verify-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ paymentId })
+      });
+
+      const verificationData = await verifyResponse.json();
+      res.json(verificationData);
+    } catch (error) {
+      console.error("Payment verification error:", error);
+      res.status(500).json({ message: "결제 검증 중 오류 발생" });
+    }
+  });
+
   // 오늘의 운세 API (한국 시간 기준 00시 00분 초기화)
   app.get("/api/daily-fortune", requireAuth, async (req, res) => {
     try {

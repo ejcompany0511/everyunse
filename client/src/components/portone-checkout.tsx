@@ -50,17 +50,23 @@ export function PortOneCheckout({ isOpen, onClose, amount, coinAmount, onSuccess
     try {
       setIsLoading(true);
       
-      const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      console.log("=== 새로운 분리형 결제 시스템 시작 ===");
       
-      console.log("=== PortOne V1 결제 요청 시작 ===");
-      console.log("StoreId:", import.meta.env.VITE_PORTONE_STORE_ID);
-      console.log("PaymentId:", orderId);
-      console.log("Amount:", amount);
+      // Step 1: Create payment request through Render server
+      const paymentResponse = await apiRequest("POST", "/api/payment/create", {
+        serviceType: "coin_charge",
+        amount: amount
+      });
+      
+      if (!paymentResponse.success) {
+        throw new Error("결제 요청 생성 실패");
+      }
+      
+      const { paymentData, orderId } = paymentResponse;
+      
+      console.log("Payment data received:", { orderId, amount });
 
-      // 테스트를 위해 항상 실제 결제창 표시 (개발/운영 동일)
-      console.log("=== 실제 PortOne 결제창 호출 ===");
-
-      // PortOne V1 스크립트 로드
+      // Step 2: Load PortOne script
       await loadPortOneScript();
       
       // 결제창 크기 및 위치 최적화 시스템
@@ -162,32 +168,28 @@ export function PortOneCheckout({ isOpen, onClose, amount, coinAmount, onSuccess
       // 결제창 크기 감지 시작
       setupPaymentPopupHandler();
       
-      // PortOne V1 결제 요청 (크기 최적화)
+      // Step 3: Launch PortOne payment with data from Render server
       window.IMP.request_pay({
         pg: "html5_inicis",
         pay_method: "card",
         merchant_uid: orderId,
-        name: `${coinAmount}냥 충전`,
-        amount: amount,
-        buyer_email: "test@everyunse.com",
-        buyer_name: "테스트사용자",
-        buyer_tel: "010-1234-5678",
-        // 팝업 크기 설정 - 화면에 맞게 조정
+        name: paymentData.orderName,
+        amount: paymentData.totalAmount,
+        buyer_email: paymentData.customer.email,
+        buyer_name: paymentData.customer.fullName,
+        buyer_tel: paymentData.customer.phoneNumber,
         popup: true,
         width: 380,
         height: 520,
       }, async (response: any) => {
         try {
           if (response.success) {
-            // 결제 성공 시 백엔드에 검증 요청
+            // Step 4: Verify payment through Render server
             const verification = await apiRequest("POST", "/api/payment/verify", {
-              paymentId: orderId,
-              amount: amount,
-              coinAmount: coinAmount,
-              impUid: response.imp_uid
+              paymentId: orderId
             });
             
-            if (verification.success) {
+            if (verification.success && verification.verified) {
               toast({
                 title: "결제 완료",
                 description: `${coinAmount}냥이 충전되었습니다!`,
