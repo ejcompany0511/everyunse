@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 async function createAllTables() {
   console.log('Creating all required tables in production...');
@@ -268,17 +268,22 @@ async function createAllTables() {
 
     console.log('✅ All tables created successfully');
 
+    // First, alter the description column to allow NULL values if it doesn't
+    await client.query(`
+      ALTER TABLE "servicePrices" ALTER COLUMN description DROP NOT NULL;
+    `);
+
     // Insert service prices data
     await client.query(`
-      INSERT INTO "servicePrices" ("serviceType", "coinCost", "displayOrder") VALUES
-      ('saju_analysis', 0, 1),
-      ('monthly_fortune', 0, 2),
-      ('love_potential', 25, 3),
-      ('reunion_potential', 25, 4),
-      ('compatibility', 25, 5),
-      ('job_prospects', 0, 6),
-      ('marriage_potential', 0, 7),
-      ('comprehensive_fortune', 30, 8)
+      INSERT INTO "servicePrices" ("serviceType", "coinCost", "displayOrder", description) VALUES
+      ('saju_analysis', 0, 1, '기본 사주 분석'),
+      ('monthly_fortune', 0, 2, '월간 운세'),
+      ('love_potential', 25, 3, '애정운 분석'),
+      ('reunion_potential', 25, 4, '재회 가능성'),
+      ('compatibility', 25, 5, '궁합 분석'),
+      ('job_prospects', 0, 6, '취업운'),
+      ('marriage_potential', 0, 7, '결혼운'),
+      ('comprehensive_fortune', 30, 8, '종합 운세')
       ON CONFLICT ("serviceType") DO NOTHING;
     `);
 
