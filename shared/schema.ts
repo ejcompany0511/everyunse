@@ -10,127 +10,127 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
-  marketingConsent: boolean("marketingConsent").default(false), // 마케팅 수신 동의
-  birthDate: text("birthDate"),
-  birthTime: text("birthTime"),
-  birthTimeUnknown: boolean("birthTimeUnknown").default(false),
+  marketingConsent: boolean("marketing_consent").default(false), // 마케팅 수신 동의
+  birthDate: text("birth_date"),
+  birthTime: text("birth_time"),
+  birthTimeUnknown: boolean("birth_time_unknown").default(false),
   gender: text("gender"),
-  calendarType: text("calendarType").default("양력"), // 양력/음력
-  isLeapMonth: boolean("isLeapMonth").default(false), // 윤달 여부
-  birthCountry: text("birthCountry").default("대한민국"), // 출생 국가
+  calendarType: text("calendar_type").default("양력"), // 양력/음력
+  isLeapMonth: boolean("is_leap_month").default(false), // 윤달 여부
+  birthCountry: text("birth_country").default("대한민국"), // 출생 국가
   timezone: text("timezone").default("Asia/Seoul"), // 시간대
-  analysisCount: integer("analysisCount").default(0),
-  coinBalance: integer("coinBalance").default(0).notNull(),
+  analysisCount: integer("analysis_count").default(0),
+  coinBalance: integer("coin_balance").default(0).notNull(),
   status: text("status").default("normal").notNull(), // normal, suspended
-  isActive: boolean("isActive").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const sajuAnalyses = pgTable("sajuAnalyses", {
+export const sajuAnalyses = pgTable("saju_analyses", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
+  userId: integer("user_id").notNull(),
   title: text("title").notNull(),
-  analysisType: text("analysisType").notNull(), // comprehensive, career, love, wealth, health
-  serviceType: text("serviceType"), // nullable field for consistency
-  birthData: jsonb("birthData").notNull(), // { date, time, gender }
+  analysisType: text("analysis_type").notNull(), // comprehensive, career, love, wealth, health
+  serviceType: text("service_type"), // nullable field for consistency
+  birthData: jsonb("birth_data").notNull(), // { date, time, gender }
   result: jsonb("result").notNull(), // AI analysis result
   summary: text("summary").notNull(),
-  createdAt: timestamp("createdAt").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const careerRecommendations = pgTable("careerRecommendations", {
+export const careerRecommendations = pgTable("career_recommendations", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  analysisId: integer("analysisId").notNull(),
+  userId: integer("user_id").notNull(),
+  analysisId: integer("analysis_id").notNull(),
   recommendations: jsonb("recommendations").notNull(), // Array of job recommendations
   strengths: jsonb("strengths").notNull(),
-  compatibleFields: jsonb("compatibleFields").notNull(),
-  createdAt: timestamp("createdAt").defaultNow(),
+  compatibleFields: jsonb("compatible_fields").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
+  userId: integer("user_id").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
   email: text("email"),
   relationship: text("relationship"),
-  birthDate: text("birthDate"),
+  birthDate: text("birth_date"),
   notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const coachingSessions = pgTable("coachingSessions", {
+export const coachingSessions = pgTable("coaching_sessions", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  sessionType: text("sessionType").notNull(), // love, career, general
+  userId: integer("user_id").notNull(),
+  sessionType: text("session_type").notNull(), // love, career, general
   topic: text("topic").notNull(),
   content: text("content").notNull(),
-  aiResponse: text("aiResponse").notNull(),
+  aiResponse: text("ai_response").notNull(),
   status: text("status").default("completed"),
-  createdAt: timestamp("createdAt").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // 코인 거래 내역
-export const coinTransactions = pgTable("coinTransactions", {
+export const coinTransactions = pgTable("coin_transactions", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
+  userId: integer("user_id").notNull(),
   type: text("type").notNull(), // charge, spend, refund
   amount: integer("amount").notNull(), // 양수: 충전/환불, 음수: 사용
-  balanceAfter: integer("balanceAfter").notNull(), // 거래 후 잔액
+  balanceAfter: integer("balance_after").notNull(), // 거래 후 잔액
   description: text("description").notNull(), // 거래 설명
-  serviceType: text("serviceType"), // saju_analysis, career_analysis, coaching 등
-  referenceId: integer("referenceId"), // 관련 서비스의 ID
-  paymentId: text("paymentId"), // PG사 결제 ID (충전 시)
-  createdAt: timestamp("createdAt").defaultNow(),
+  serviceType: text("service_type"), // saju_analysis, career_analysis, coaching 등
+  referenceId: integer("reference_id"), // 관련 서비스의 ID
+  paymentId: text("payment_id"), // PG사 결제 ID (충전 시)
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // 서비스별 코인 소모량 설정
-export const servicePrices = pgTable("servicePrices", {
+export const servicePrices = pgTable("service_prices", {
   id: serial("id").primaryKey(),
-  serviceType: text("serviceType").notNull().unique(), // saju_analysis, career_analysis, coaching, compatibility
-  coinCost: integer("coinCost").notNull(), // 필요 코인 수
+  serviceType: text("service_type").notNull().unique(), // saju_analysis, career_analysis, coaching, compatibility
+  coinCost: integer("coin_cost").notNull(), // 필요 코인 수
   description: text("description").notNull(), // 서비스 설명
-  displayOrder: integer("displayOrder").default(0).notNull(), // 정렬 순서
-  isActive: boolean("isActive").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow(),
+  displayOrder: integer("display_order").default(0).notNull(), // 정렬 순서
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // 이용 후기 테이블
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
+  userId: integer("user_id").notNull(),
   username: text("username").notNull(), // 후기 작성자명
-  serviceType: text("serviceType").notNull(), // 이용한 서비스 타입
+  serviceType: text("service_type").notNull(), // 이용한 서비스 타입
   rating: integer("rating").notNull(), // 1-5 별점
   title: text("title").notNull(), // 후기 제목
   content: text("content").notNull(), // 후기 내용
-  isHelpful: boolean("isHelpful").default(false),
-  helpfulCount: integer("helpfulCount").default(0),
-  approvalStatus: text("approvalStatus").default("pending").notNull(), // pending, approved, rejected
-  createdAt: timestamp("createdAt").defaultNow(),
+  isHelpful: boolean("is_helpful").default(false),
+  helpfulCount: integer("helpful_count").default(0),
+  approvalStatus: text("approval_status").default("pending").notNull(), // pending, approved, rejected
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // 오늘의 운세 캐시 테이블
-export const dailyFortunes = pgTable("dailyFortunes", {
+export const dailyFortunes = pgTable("daily_fortunes", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  fortuneDate: text("fortuneDate").notNull(), // YYYY-MM-DD 형식 (한국시간 기준)
+  userId: integer("user_id").notNull(),
+  fortuneDate: text("fortune_date").notNull(), // YYYY-MM-DD 형식 (한국시간 기준)
   fortune: text("fortune").notNull(), // 운세 내용
-  createdAt: timestamp("createdAt").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // 미리 계산된 분석 테이블
-export const precomputedAnalyses = pgTable("precomputedAnalyses", {
+export const precomputedAnalyses = pgTable("precomputed_analyses", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(),
-  analysisType: text("analysisType").notNull(), // monthly, love, career, marriage, comprehensive
-  birthData: jsonb("birthData").notNull(),
+  userId: integer("user_id").notNull(),
+  analysisType: text("analysis_type").notNull(), // monthly, love, career, marriage, comprehensive
+  birthData: jsonb("birth_data").notNull(),
   result: jsonb("result").notNull(),
-  validUntil: timestamp("validUntil").notNull(),
-  generatedAt: timestamp("generatedAt").defaultNow(),
-  isActive: boolean("isActive").default(true),
+  validUntil: timestamp("valid_until").notNull(),
+  generatedAt: timestamp("generated_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
 });
 
 
@@ -251,90 +251,90 @@ export type PrecomputedAnalysis = typeof precomputedAnalyses.$inferSelect;
 export type InsertPrecomputedAnalysis = typeof precomputedAnalyses.$inferInsert;
 
 // Admin system tables
-export const adminUsers = pgTable("adminUsers", {
+export const adminUsers = pgTable("admin_users", {
   id: serial("id").primaryKey(),
   username: text("username").unique().notNull(),
   email: text("email").unique().notNull(),
   password: text("password").notNull(),
   role: text("role").notNull().default("operator"), // super_admin, admin, operator, support
   permissions: jsonb("permissions").default({}),
-  isActive: boolean("isActive").default(true),
-  lastLogin: timestamp("lastLogin"),
-  createdAt: timestamp("createdAt").defaultNow(),
-  updatedAt: timestamp("updatedAt").defaultNow(),
+  isActive: boolean("is_active").default(true),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const adminLogs = pgTable("adminLogs", {
+export const adminLogs = pgTable("admin_logs", {
   id: serial("id").primaryKey(),
-  adminId: integer("adminId").references(() => adminUsers.id),
+  adminId: integer("admin_id").references(() => adminUsers.id),
   action: text("action").notNull(),
-  targetType: text("targetType"), // user, product, review, etc
-  targetId: integer("targetId"),
+  targetType: text("target_type"), // user, product, review, etc
+  targetId: integer("target_id"),
   description: text("description"),
-  ipAddress: text("ipAddress"),
-  userAgent: text("userAgent"),
-  createdAt: timestamp("createdAt").defaultNow(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const userSuspensions = pgTable("userSuspensions", {
+export const userSuspensions = pgTable("user_suspensions", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").references(() => users.id),
-  adminId: integer("adminId").references(() => adminUsers.id),
+  userId: integer("user_id").references(() => users.id),
+  adminId: integer("admin_id").references(() => adminUsers.id),
   reason: text("reason").notNull(),
-  startDate: timestamp("startDate").defaultNow(),
-  endDate: timestamp("endDate"),
-  isActive: boolean("isActive").default(true),
-  createdAt: timestamp("createdAt").defaultNow(),
+  startDate: timestamp("start_date").defaultNow(),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const userReports = pgTable("userReports", {
+export const userReports = pgTable("user_reports", {
   id: serial("id").primaryKey(),
-  reporterUserId: integer("reporterUserId").references(() => users.id),
-  reportedUserId: integer("reportedUserId").references(() => users.id),
+  reporterUserId: integer("reporter_user_id").references(() => users.id),
+  reportedUserId: integer("reported_user_id").references(() => users.id),
   type: text("type").notNull(), // fraud, inappropriate, spam, etc
   reason: text("reason").notNull(),
   status: text("status").default("pending"), // pending, reviewed, resolved, dismissed
-  adminId: integer("adminId").references(() => adminUsers.id),
-  adminNotes: text("adminNotes"),
-  resolvedAt: timestamp("resolvedAt"),
-  createdAt: timestamp("createdAt").defaultNow(),
+  adminId: integer("admin_id").references(() => adminUsers.id),
+  adminNotes: text("admin_notes"),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const inquiries = pgTable("inquiries", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
   subject: text("subject").notNull(),
   content: text("content").notNull(),
   status: text("status").default("pending"), // pending, answered, closed
   priority: text("priority").default("normal"), // low, normal, high, urgent
-  adminId: integer("adminId").references(() => adminUsers.id),
+  adminId: integer("admin_id").references(() => adminUsers.id),
   response: text("response"),
-  respondedAt: timestamp("respondedAt"),
-  createdAt: timestamp("createdAt").defaultNow(),
+  respondedAt: timestamp("responded_at"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const systemNotifications = pgTable("systemNotifications", {
+export const systemNotifications = pgTable("system_notifications", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
   type: text("type").notNull(), // announcement, maintenance, alert
-  targetUserIds: jsonb("targetUserIds"), // null for all users, array for specific users
-  isActive: boolean("isActive").default(true),
-  startDate: timestamp("startDate").defaultNow(),
-  endDate: timestamp("endDate"),
-  createdBy: integer("createdBy").references(() => adminUsers.id),
-  createdAt: timestamp("createdAt").defaultNow(),
+  targetUserIds: jsonb("target_user_ids"), // null for all users, array for specific users
+  isActive: boolean("is_active").default(true),
+  startDate: timestamp("start_date").defaultNow(),
+  endDate: timestamp("end_date"),
+  createdBy: integer("created_by").references(() => adminUsers.id),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const userNotifications = pgTable("userNotifications", {
+export const userNotifications = pgTable("user_notifications", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").references(() => users.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
   type: text("type").notNull(), // inquiry_response, system_announcement, etc
-  isRead: boolean("isRead").default(false),
-  relatedId: integer("relatedId"), // inquiry id, report id, etc
-  createdAt: timestamp("createdAt").defaultNow(),
+  isRead: boolean("is_read").default(false),
+  relatedId: integer("related_id"), // inquiry id, report id, etc
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const announcements = pgTable("announcements", {
@@ -343,22 +343,22 @@ export const announcements = pgTable("announcements", {
   content: text("content").notNull(),
   type: text("type").notNull(), // notice, event, maintenance, update
   priority: text("priority").notNull(), // normal, urgent
-  targetAudience: text("targetAudience").notNull(), // all, premium, new
-  adminId: integer("adminId").references(() => adminUsers.id).notNull(),
-  isActive: boolean("isActive").default(true),
-  createdAt: timestamp("createdAt").defaultNow(),
+  targetAudience: text("target_audience").notNull(), // all, premium, new
+  adminId: integer("admin_id").references(() => adminUsers.id).notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const salesStats = pgTable("salesStats", {
+export const salesStats = pgTable("sales_stats", {
   id: serial("id").primaryKey(),
   date: date("date").notNull(),
-  totalRevenue: text("totalRevenue").default("0"),
-  totalTransactions: integer("totalTransactions").default(0),
-  newUsers: integer("newUsers").default(0),
-  activeUsers: integer("activeUsers").default(0),
-  topProducts: jsonb("topProducts").default({}),
-  conversionRate: text("conversionRate").default("0"),
-  createdAt: timestamp("createdAt").defaultNow(),
+  totalRevenue: text("total_revenue").default("0"),
+  totalTransactions: integer("total_transactions").default(0),
+  newUsers: integer("new_users").default(0),
+  activeUsers: integer("active_users").default(0),
+  topProducts: jsonb("top_products").default({}),
+  conversionRate: text("conversion_rate").default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Admin Relations

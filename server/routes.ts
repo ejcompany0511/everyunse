@@ -44,56 +44,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { sql } = await import('drizzle-orm');
       const { db } = await import('./db');
       
-      // Check if displayOrder column exists in servicePrices table (camelCase)
+      // Check if display_order column exists in service_prices table
       const displayOrderCheck = await db.execute(sql`
         SELECT EXISTS (
           SELECT FROM information_schema.columns 
-          WHERE table_name = 'servicePrices' 
-          AND column_name = 'displayOrder'
+          WHERE table_name = 'service_prices' 
+          AND column_name = 'display_order'
         );
       `);
       
       if (!displayOrderCheck.rows[0].exists) {
-        console.log('Adding missing displayOrder column...');
+        console.log('Adding missing display_order column...');
         await db.execute(sql`
-          ALTER TABLE "servicePrices" 
-          ADD COLUMN "displayOrder" INTEGER NOT NULL DEFAULT 0;
+          ALTER TABLE service_prices 
+          ADD COLUMN display_order INTEGER NOT NULL DEFAULT 0;
         `);
         
-        console.log('✅ Schema fixed: displayOrder column added');
+        // Update existing records with proper display order
+        // Note: Render DB uses camelCase column names
+        await db.execute(sql`
+          UPDATE service_prices SET display_order = 1 WHERE "serviceType" = 'monthly_fortune';
+          UPDATE service_prices SET display_order = 2 WHERE "serviceType" = 'love_potential';
+          UPDATE service_prices SET display_order = 3 WHERE "serviceType" = 'reunion_potential';
+          UPDATE service_prices SET display_order = 4 WHERE "serviceType" = 'compatibility';
+          UPDATE service_prices SET display_order = 5 WHERE "serviceType" = 'job_prospects';
+          UPDATE service_prices SET display_order = 6 WHERE "serviceType" = 'marriage_potential';
+          UPDATE service_prices SET display_order = 7 WHERE "serviceType" = 'comprehensive_fortune';
+        `);
+        
+        console.log('✅ Schema fixed: display_order column added and populated');
       } else {
-        console.log('✅ Schema OK: displayOrder column exists');
+        console.log('✅ Schema OK: display_order column exists');
       }
-      
-      // Force production table creation if needed (deployment trigger: 2025-01-09)
-      const forceTableCreation = await db.execute(sql`
-        CREATE TABLE IF NOT EXISTS "servicePrices" (
-          id SERIAL PRIMARY KEY,
-          "serviceType" VARCHAR NOT NULL UNIQUE,
-          "coinCost" INTEGER NOT NULL DEFAULT 0,
-          "displayOrder" INTEGER NOT NULL DEFAULT 0,
-          description TEXT,
-          "createdAt" TIMESTAMP DEFAULT NOW(),
-          "updatedAt" TIMESTAMP DEFAULT NOW()
-        );
-      `);
-      
-      // Ensure service data exists
-      await db.execute(sql`
-        INSERT INTO "servicePrices" ("serviceType", "coinCost", "displayOrder") VALUES
-        ('saju_analysis', 0, 1),
-        ('monthly_fortune', 0, 2),
-        ('love_potential', 25, 3),
-        ('reunion_potential', 25, 4),
-        ('compatibility', 25, 5),
-        ('job_prospects', 0, 6),
-        ('marriage_potential', 0, 7),
-        ('comprehensive_fortune', 30, 8)
-        ON CONFLICT ("serviceType") DO NOTHING;
-      `);
-      
-      console.log('✅ Production schema ensured');
-      
     } catch (error) {
       console.error('Schema consistency check failed:', error.message);
     }
