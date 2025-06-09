@@ -1,43 +1,44 @@
 #!/usr/bin/env node
 
-import { Pool } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import { migrate } from 'drizzle-orm/neon-serverless/migrator';
-import ws from "ws";
-// Schema will be created via raw SQL
+// This script sets up the database schema on Render's new PostgreSQL instance
+// Run this on Render by setting DATABASE_URL to the new database connection string
 
-// Configure WebSocket for Neon
+import { Pool } from '@neondatabase/serverless';
+import ws from "ws";
+
+// Configure WebSocket for Neon compatibility
 if (typeof WebSocket === 'undefined') {
   global.WebSocket = ws;
 }
 
-async function createSchema() {
+async function setupRenderDatabase() {
   try {
-    console.log('=== CREATING DATABASE SCHEMA ===');
+    console.log('=== RENDER DATABASE SETUP ===');
     
+    // Use the new database URL that should be set in Render environment
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL environment variable is required');
     }
     
-    console.log('Connecting to database...');
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const db = drizzle(pool);
+    console.log('Connecting to new Render database...');
+    const pool = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
     
-    console.log('Creating tables...');
+    console.log('Creating all required tables...');
     
-    // Create all tables using raw SQL
+    // Create sessions table (required for auth)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS sessions (
         sid varchar PRIMARY KEY,
         sess jsonb NOT NULL,
         expire timestamp NOT NULL
       );
-    `);
-    
-    await pool.query(`
       CREATE INDEX IF NOT EXISTS IDX_session_expire ON sessions(expire);
     `);
     
+    // Create users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id serial PRIMARY KEY,
@@ -57,6 +58,7 @@ async function createSchema() {
       );
     `);
     
+    // Create admin_users table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS admin_users (
         id serial PRIMARY KEY,
@@ -71,6 +73,7 @@ async function createSchema() {
       );
     `);
     
+    // Create saju_analyses table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS saju_analyses (
         id serial PRIMARY KEY,
@@ -83,6 +86,7 @@ async function createSchema() {
       );
     `);
     
+    // Create career_recommendations table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS career_recommendations (
         id serial PRIMARY KEY,
@@ -94,6 +98,7 @@ async function createSchema() {
       );
     `);
     
+    // Create coaching_sessions table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS coaching_sessions (
         id serial PRIMARY KEY,
@@ -106,6 +111,7 @@ async function createSchema() {
       );
     `);
     
+    // Create coin_transactions table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS coin_transactions (
         id serial PRIMARY KEY,
@@ -119,6 +125,7 @@ async function createSchema() {
       );
     `);
     
+    // Create service_prices table (CRITICAL for the application)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS service_prices (
         id serial PRIMARY KEY,
@@ -132,6 +139,7 @@ async function createSchema() {
       );
     `);
     
+    // Create reviews table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS reviews (
         id serial PRIMARY KEY,
@@ -145,6 +153,7 @@ async function createSchema() {
       );
     `);
     
+    // Create daily_fortunes table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS daily_fortunes (
         id serial PRIMARY KEY,
@@ -156,6 +165,7 @@ async function createSchema() {
       );
     `);
     
+    // Create user_reports table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_reports (
         id serial PRIMARY KEY,
@@ -172,6 +182,7 @@ async function createSchema() {
       );
     `);
     
+    // Create inquiries table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS inquiries (
         id serial PRIMARY KEY,
@@ -187,6 +198,7 @@ async function createSchema() {
       );
     `);
     
+    // Create user_notifications table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_notifications (
         id serial PRIMARY KEY,
@@ -199,6 +211,7 @@ async function createSchema() {
       );
     `);
     
+    // Create system_notifications table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS system_notifications (
         id serial PRIMARY KEY,
@@ -211,6 +224,7 @@ async function createSchema() {
       );
     `);
     
+    // Create announcements table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS announcements (
         id serial PRIMARY KEY,
@@ -226,6 +240,7 @@ async function createSchema() {
       );
     `);
     
+    // Create admin_logs table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS admin_logs (
         id serial PRIMARY KEY,
@@ -239,6 +254,7 @@ async function createSchema() {
       );
     `);
     
+    // Create precomputed_analyses table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS precomputed_analyses (
         id serial PRIMARY KEY,
@@ -253,8 +269,8 @@ async function createSchema() {
     
     console.log('✅ All tables created successfully');
     
-    // Insert default service prices
-    console.log('Inserting default service prices...');
+    // Insert critical service prices data
+    console.log('Inserting essential service prices...');
     await pool.query(`
       INSERT INTO service_prices (service_type, coin_cost, description, display_order) VALUES
       ('saju_analysis', 0, '기본 사주 분석', 1),
@@ -270,15 +286,35 @@ async function createSchema() {
       ON CONFLICT (service_type) DO NOTHING;
     `);
     
-    console.log('✅ Default service prices inserted');
-    console.log('=== SCHEMA CREATION COMPLETE ===');
+    // Create default admin user
+    console.log('Creating default admin user...');
+    await pool.query(`
+      INSERT INTO admin_users (username, password_hash, email, role) VALUES
+      ('EJCompany0511', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ejcompany0511@gmail.com', 'super_admin')
+      ON CONFLICT (username) DO NOTHING;
+    `);
+    
+    console.log('✅ Service prices and admin user created');
+    
+    // Verify tables exist
+    const result = await pool.query(`
+      SELECT table_name FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name;
+    `);
+    
+    console.log('✅ Database tables verified:');
+    result.rows.forEach(row => {
+      console.log(`  - ${row.table_name}`);
+    });
     
     await pool.end();
+    console.log('=== RENDER DATABASE SETUP COMPLETE ===');
     
   } catch (error) {
-    console.error('Schema creation failed:', error);
+    console.error('❌ Database setup failed:', error);
     process.exit(1);
   }
 }
 
-createSchema();
+setupRenderDatabase();
