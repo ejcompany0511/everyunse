@@ -10,91 +10,91 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
-  marketingConsent: boolean("marketing_consent").default(false), // 마케팅 수신 동의
-  birthDate: text("birth_date"),
-  birthTime: text("birth_time"),
-  birthTimeUnknown: boolean("birth_time_unknown").default(false),
+  marketingConsent: boolean("marketingConsent").default(false), // 마케팅 수신 동의
+  birthDate: text("birthDate"),
+  birthTime: text("birthTime"),
+  birthTimeUnknown: boolean("birthTimeUnknown").default(false),
   gender: text("gender"),
-  calendarType: text("calendar_type").default("양력"), // 양력/음력
-  isLeapMonth: boolean("is_leap_month").default(false), // 윤달 여부
-  birthCountry: text("birth_country").default("대한민국"), // 출생 국가
+  calendarType: text("calendarType").default("양력"), // 양력/음력
+  isLeapMonth: boolean("isLeapMonth").default(false), // 윤달 여부
+  birthCountry: text("birthCountry").default("대한민국"), // 출생 국가
   timezone: text("timezone").default("Asia/Seoul"), // 시간대
-  analysisCount: integer("analysis_count").default(0),
-  coinBalance: integer("coin_balance").default(0).notNull(),
+  analysisCount: integer("analysisCount").default(0),
+  coinBalance: integer("coinBalance").default(0).notNull(),
   status: text("status").default("normal").notNull(), // normal, suspended
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
-export const sajuAnalyses = pgTable("saju_analyses", {
+export const sajuAnalyses = pgTable("sajuAnalyses", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: integer("userId").notNull(),
   title: text("title").notNull(),
-  analysisType: text("analysis_type").notNull(), // comprehensive, career, love, wealth, health
-  serviceType: text("service_type"), // nullable field for consistency
-  birthData: jsonb("birth_data").notNull(), // { date, time, gender }
+  analysisType: text("analysisType").notNull(), // comprehensive, career, love, wealth, health
+  serviceType: text("serviceType"), // nullable field for consistency
+  birthData: jsonb("birthData").notNull(), // { date, time, gender }
   result: jsonb("result").notNull(), // AI analysis result
   summary: text("summary").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
-export const careerRecommendations = pgTable("career_recommendations", {
+export const careerRecommendations = pgTable("careerRecommendations", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  analysisId: integer("analysis_id").notNull(),
+  userId: integer("userId").notNull(),
+  analysisId: integer("analysisId").notNull(),
   recommendations: jsonb("recommendations").notNull(), // Array of job recommendations
   strengths: jsonb("strengths").notNull(),
-  compatibleFields: jsonb("compatible_fields").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  compatibleFields: jsonb("compatibleFields").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
 export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: integer("userId").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
   email: text("email"),
   relationship: text("relationship"),
-  birthDate: text("birth_date"),
+  birthDate: text("birthDate"),
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
-export const coachingSessions = pgTable("coaching_sessions", {
+export const coachingSessions = pgTable("coachingSessions", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  sessionType: text("session_type").notNull(), // love, career, general
+  userId: integer("userId").notNull(),
+  sessionType: text("sessionType").notNull(), // love, career, general
   topic: text("topic").notNull(),
   content: text("content").notNull(),
-  aiResponse: text("ai_response").notNull(),
+  aiResponse: text("aiResponse").notNull(),
   status: text("status").default("completed"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
 // 코인 거래 내역
-export const coinTransactions = pgTable("coin_transactions", {
+export const coinTransactions = pgTable("coinTransactions", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: integer("userId").notNull(),
   type: text("type").notNull(), // charge, spend, refund
   amount: integer("amount").notNull(), // 양수: 충전/환불, 음수: 사용
-  balanceAfter: integer("balance_after").notNull(), // 거래 후 잔액
+  balanceAfter: integer("balanceAfter").notNull(), // 거래 후 잔액
   description: text("description").notNull(), // 거래 설명
-  serviceType: text("service_type"), // saju_analysis, career_analysis, coaching 등
-  referenceId: integer("reference_id"), // 관련 서비스의 ID
-  paymentId: text("payment_id"), // PG사 결제 ID (충전 시)
-  createdAt: timestamp("created_at").defaultNow(),
+  serviceType: text("serviceType"), // saju_analysis, career_analysis, coaching 등
+  referenceId: integer("referenceId"), // 관련 서비스의 ID
+  paymentId: text("paymentId"), // PG사 결제 ID (충전 시)
+  createdAt: timestamp("createdAt").defaultNow(),
 });
 
 // 서비스별 코인 소모량 설정
-export const servicePrices = pgTable("service_prices", {
+export const servicePrices = pgTable("servicePrices", {
   id: serial("id").primaryKey(),
-  serviceType: text("service_type").notNull().unique(), // saju_analysis, career_analysis, coaching, compatibility
-  coinCost: integer("coin_cost").notNull(), // 필요 코인 수
+  serviceType: text("serviceType").notNull().unique(), // saju_analysis, career_analysis, coaching, compatibility
+  coinCost: integer("coinCost").notNull(), // 필요 코인 수
   description: text("description").notNull(), // 서비스 설명
-  displayOrder: integer("display_order").default(0).notNull(), // 정렬 순서
-  isActive: boolean("is_active").default(true).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  displayOrder: integer("displayOrder").default(0).notNull(), // 정렬 순서
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
 // 이용 후기 테이블

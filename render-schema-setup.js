@@ -60,16 +60,16 @@ async function setupRenderDatabase() {
     
     // Create admin_users table
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS admin_users (
+      CREATE TABLE IF NOT EXISTS "adminUsers" (
         id serial PRIMARY KEY,
         username varchar(255) UNIQUE NOT NULL,
-        password_hash varchar(255) NOT NULL,
+        "passwordHash" varchar(255) NOT NULL,
         email varchar(255),
         role varchar(50) DEFAULT 'admin',
-        is_active boolean DEFAULT true,
-        last_login timestamp,
-        created_at timestamp DEFAULT NOW(),
-        updated_at timestamp DEFAULT NOW()
+        "isActive" boolean DEFAULT true,
+        "lastLogin" timestamp,
+        "createdAt" timestamp DEFAULT NOW(),
+        "updatedAt" timestamp DEFAULT NOW()
       );
     `);
     
