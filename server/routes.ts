@@ -44,37 +44,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { sql } = await import('drizzle-orm');
       const { db } = await import('./db');
       
-      // Check if display_order column exists in service_prices table
+      // Check if displayOrder column exists in servicePrices table (camelCase)
       const displayOrderCheck = await db.execute(sql`
         SELECT EXISTS (
           SELECT FROM information_schema.columns 
-          WHERE table_name = 'service_prices' 
-          AND column_name = 'display_order'
+          WHERE table_name = 'servicePrices' 
+          AND column_name = 'displayOrder'
         );
       `);
       
       if (!displayOrderCheck.rows[0].exists) {
-        console.log('Adding missing display_order column...');
+        console.log('Adding missing displayOrder column...');
         await db.execute(sql`
-          ALTER TABLE service_prices 
-          ADD COLUMN display_order INTEGER NOT NULL DEFAULT 0;
+          ALTER TABLE "servicePrices" 
+          ADD COLUMN "displayOrder" INTEGER NOT NULL DEFAULT 0;
         `);
         
-        // Update existing records with proper display order
-        // Note: Render DB uses camelCase column names
-        await db.execute(sql`
-          UPDATE service_prices SET display_order = 1 WHERE "serviceType" = 'monthly_fortune';
-          UPDATE service_prices SET display_order = 2 WHERE "serviceType" = 'love_potential';
-          UPDATE service_prices SET display_order = 3 WHERE "serviceType" = 'reunion_potential';
-          UPDATE service_prices SET display_order = 4 WHERE "serviceType" = 'compatibility';
-          UPDATE service_prices SET display_order = 5 WHERE "serviceType" = 'job_prospects';
-          UPDATE service_prices SET display_order = 6 WHERE "serviceType" = 'marriage_potential';
-          UPDATE service_prices SET display_order = 7 WHERE "serviceType" = 'comprehensive_fortune';
-        `);
-        
-        console.log('✅ Schema fixed: display_order column added and populated');
+        console.log('✅ Schema fixed: displayOrder column added');
       } else {
-        console.log('✅ Schema OK: display_order column exists');
+        console.log('✅ Schema OK: displayOrder column exists');
       }
     } catch (error) {
       console.error('Schema consistency check failed:', error.message);
